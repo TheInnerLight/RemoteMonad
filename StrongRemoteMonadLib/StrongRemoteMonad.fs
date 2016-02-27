@@ -1,7 +1,6 @@
 ﻿namespace StrongRemoteMonad
 
-/// A queue of commands
-type Queue = Shared.Command list
+
 
 /// The remote type we use to build the state/reader monad 
 type Remote<'a> = Remote of (Remote.Device -> Queue -> 'a * Queue)
@@ -47,19 +46,22 @@ module StrongRemoteMonad =
         let (a, queue) = runRemote ra device []
         match queue with
         |[] -> ()
-        |_ -> Remote.async device (Serialisation.serialise <| Array.ofList queue)
+        |_ ->
+            let asyncPacket = Remote.createAsyncPacket queue
+            Remote.async device (Serialisation.serialise asyncPacket)
         a
 
     /// Send a command to the remote device
     let sendCommand cmd =
-        modify (fun queue -> queue @ [cmd])
+        modify (fun queue -> cmd :: queue)
 
     /// Send a procedure to the remote device
     let sendProcedure proc =
         remote{
             let! dev = ask
             let! queue = get
-            let str = Remote.sync dev (Serialisation.serialise (Remote.SyncPacket(Array.ofList queue, Remote.procedureToRProcedure proc)))
+            let syncPacket = Remote.createSyncPacket queue proc
+            let str = Remote.sync dev (Serialisation.serialise syncPacket)
             do! put []
             return (Local.readProcedureReply proc str)
         }

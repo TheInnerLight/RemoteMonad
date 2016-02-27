@@ -10,9 +10,24 @@ let main argv =
         remote{
             do! say "Howdy doodly do"
             do! say "How about a muffin?"
+        }
+
+    printfn "---"
+
+    send (Remote.device) <|
+        remote{
             let! t = temperature
             do! say (sprintf "%dF" t)
             do! toast 4
+        }
+
+    printfn "---"
+
+    send (Remote.device) <|
+        remote{
+            do! say "Do you want some toast?"
+            let! t = temperature
+            do! say (sprintf "%dF" t)
         }
 
     ignore <| System.Console.ReadKey() // wait for user input before closing

@@ -45,6 +45,9 @@ module Shared =
 
 open Shared
 
+/// A queue of commands
+type Queue = Command list
+
 /// Local service type definitions
 module Local =
     /// Strongly typed procedure which returns a result of type 'a
@@ -119,4 +122,16 @@ module Remote =
     let procedureToRProcedure = function
         |Local.Temperature -> Temperature
         |Local.Toast time -> Toast time
+
+    /// Reverse a queue and covert to a command array
+    let private queueToArray : Queue -> Command[] =
+        Array.ofList << List.rev
+
+    /// Creates an async packet from a command queue
+    let createAsyncPacket queue =
+        AsyncPacket <| queueToArray queue
+
+    /// Creates a sync packet from a command queue and procedure
+    let createSyncPacket queue proc  =
+        SyncPacket(queueToArray queue, procedureToRProcedure proc)
 
