@@ -6,7 +6,7 @@ open StrongRemoteMonad
 [<EntryPoint>]
 let main argv = 
 
-    send (Remote.device) <|
+    send (Service.device) <|
         remote{
             do! say "Howdy doodly do"
             do! say "How about a muffin?"
@@ -14,7 +14,7 @@ let main argv =
 
     printfn "---"
 
-    send (Remote.device) <|
+    send (Service.device) <|
         remote{
             let! t = temperature
             do! say (sprintf "%dF" t)
@@ -23,7 +23,7 @@ let main argv =
 
     printfn "---"
 
-    send (Remote.device) <|
+    send (Service.device) <|
         remote{
             do! say "Do you want some toast?"
             let! t = temperature

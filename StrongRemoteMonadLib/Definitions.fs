@@ -1,28 +1,7 @@
 ﻿namespace StrongRemoteMonad
 
-open System.Reflection
-open FSharp.Reflection
 open System.IO
 open System.Runtime.Serialization
-open System.Runtime.Serialization.Json
-
-/// Serialisation Functions
-module Serialisation =
-    /// Serialise some object of type <'a> to a JSON string
-    let serialise<'a> (data :'a) = 
-        let jsonSerializer = new DataContractJsonSerializer(typedefof<'a>)
-        use stream = new MemoryStream()
-        jsonSerializer.WriteObject(stream, data)
-        System.Text.Encoding.ASCII.GetString <| stream.ToArray()
-    /// Deserialise some object of type <'a> from a JSON string
-    let deserialise<'a> (str : string) =
-        let jsonSerializer = new DataContractJsonSerializer(typedefof<'a>)
-        use stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes str)
-        jsonSerializer.ReadObject(stream) :?> 'a
-    /// Helper function for generating Known Types for Union types
-    let unionKnownTypeHelper<'a>() =
-        typeof<'a>.GetNestedTypes(BindingFlags.Public ||| BindingFlags.NonPublic)
-        |> Array.filter FSharpType.IsUnion
 
 open Serialisation
 
@@ -113,25 +92,4 @@ module Remote =
     let execAsyncPacket = function
         |AsyncPacket (commands) ->
             Array.iter (execRCommand) commands
-
-    /// A device that simulates communication
-    let device =
-        Device (execSyncPacket << deserialise, execAsyncPacket << deserialise)
-
-    /// Convert a Procedure to an RProcedure for serialisation
-    let procedureToRProcedure = function
-        |Local.Temperature -> Temperature
-        |Local.Toast time -> Toast time
-
-    /// Reverse a queue and covert to a command array
-    let private queueToArray : Queue -> Command[] =
-        Array.ofList << List.rev
-
-    /// Creates an async packet from a command queue
-    let createAsyncPacket queue =
-        AsyncPacket <| queueToArray queue
-
-    /// Creates a sync packet from a command queue and procedure
-    let createSyncPacket queue proc  =
-        SyncPacket(queueToArray queue, procedureToRProcedure proc)
 
