@@ -19,6 +19,14 @@ module Service =
     let device =
         Device (execSyncPacket << deserialise, execAsyncPacket << deserialise)
 
+    /// Returns the synchronous communication channel for the device
+    let sync = function
+        |Device (f, _) -> f
+
+    /// Returns the asychronous communication channel for the device
+    let async = function
+        |Device (_, f) -> f
+
     /// Creates an async packet from a command queue
     let createAsyncPacket queue =
         AsyncPacket <| queueToArray queue

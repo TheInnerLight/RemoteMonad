@@ -48,7 +48,7 @@ module StrongRemoteMonad =
         |[] -> ()
         |_ ->
             let asyncPacket = Service.createAsyncPacket queue
-            Remote.async device (Serialisation.serialise asyncPacket)
+            Service.async device (Serialisation.serialise asyncPacket)
         a
 
     /// Send a command to the remote device
@@ -61,7 +61,7 @@ module StrongRemoteMonad =
             let! dev = ask
             let! queue = get
             let syncPacket = Service.createSyncPacket queue proc
-            let str = Remote.sync dev (Serialisation.serialise syncPacket)
+            let str = Service.sync dev (Serialisation.serialise syncPacket)
             do! put []
             return (Local.readProcedureReply proc str)
         }

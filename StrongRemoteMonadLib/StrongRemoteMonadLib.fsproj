@@ -47,7 +47,9 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Serialisation.fs" />
+    <Compile Include="Shared.fs" />
     <Compile Include="Definitions.fs" />
+    <Compile Include="Remote.fs" />
     <Compile Include="Service.fs" />
     <Compile Include="StrongRemoteMonad.fs" />
   </ItemGroup>
